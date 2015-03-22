@@ -56,19 +56,9 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 </div>
 
 
-<div id="background" class="section level1">
-<h1>Background</h1>
-<p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a> (see the section on the Weight Lifting Exercise Dataset).</p>
-</div>
-<div id="data" class="section level1">
-<h1>Data</h1>
-<p>The training data for this project are available here: [<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a>]</p>
-<p>The test data are available here: [<a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a>]</p>
-<p>The data for this project come from this source: [<a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>]. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.</p>
-</div>
 <div id="summary" class="section level1">
 <h1>Summary</h1>
-<p>The data analysis conducted below provides a description of the algorithm used to predict personal activity monitoring using health monitoring devices. Based on the data, future outcomes are predicted on new test data. The training set accuracy was recorded as 99%.</p>
+<p>The data analysis below provides a description of the algorithm used to predict personal activity monitoring using data from health monitoring devices at [<a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>] . Future outcomes are predicted on new test data using training data. The training set accuracy=99%.</p>
 </div>
 <div id="loading-and-cleaning-data" class="section level1">
 <h1>Loading and Cleaning Data</h1>
@@ -86,8 +76,8 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
     cleanTrain &lt;- trainSet[,colSums(is.na(trainSet)) == 0]
     cleanTest &lt;-testSet[,colSums(is.na(testSet)) == 0]</code></pre>
 </div>
-<div id="training-and-cross-validation-datasets" class="section level1">
-<h1>Training and Cross-Validation datasets</h1>
+<div id="create-training-and-cross-validation-datasets" class="section level1">
+<h1>Create Training and Cross-Validation datasets</h1>
 <p>Use 70% for train and 30% for test</p>
 <pre class="r"><code>    trainIndex &lt;- createDataPartition(y = cleanTrain$classe, p=0.7,list=FALSE)
     trainSet &lt;- cleanTrain[trainIndex,]
@@ -115,10 +105,10 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 ## 
 ## Resampling results across tuning parameters:
 ## 
-##   mtry  Accuracy   Kappa      Accuracy SD   Kappa SD   
-##    2    0.9930113  0.9911589  0.0009534286  0.001206406
-##   27    0.9960687  0.9950270  0.0012702991  0.001607113
-##   53    0.9939578  0.9923567  0.0010997154  0.001391130
+##   mtry  Accuracy   Kappa      Accuracy SD   Kappa SD    
+##    2    0.9933026  0.9915278  0.0010381418  0.0013132402
+##   27    0.9967242  0.9958564  0.0006458708  0.0008171239
+##   53    0.9931577  0.9913445  0.0023806304  0.0030127736
 ## 
 ## Accuracy was used to select the optimal model using  the largest value.
 ## The final value used for the model was mtry = 27.</code></pre>
@@ -127,7 +117,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <h1>Cross Validation</h1>
 <pre class="r"><code>    predicted &lt;- predict(modelFit, crossValidationSet)
     SampleError &lt;- sum(predicted == crossValidationSet$classe)/nrow(crossValidationSet)</code></pre>
-<p>Out of sample error is 0.9983008</p>
+<p>Out of sample error is .9978</p>
 </div>
 <div id="testing-on-new-data" class="section level1">
 <h1>Testing on new data</h1>
