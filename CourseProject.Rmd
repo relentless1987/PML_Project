@@ -1,0 +1,79 @@
+---
+title: "Practical Machine Learning Course Project:  Learning Algorithm for Personal Activity Monitoring"
+date: "Saturday, March 21, 2015"
+output: html_document
+---
+#   Background
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset).
+
+#   Data
+The training data for this project are available here: [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv]
+
+The test data are available here: [https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv]
+
+The data for this project come from this source: [http://groupware.les.inf.puc-rio.br/har]. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+#   Summary
+
+The data analysis below provides a description of the algorithm used to predict personal activity monitoring using health monitoring devices. Future outcomes are predicted on new test data using training data. The training set accuracy=99%.
+
+#   Loading and Cleaning Data
+
+```{r}
+    set.seed = 1987
+    library(caret)
+    library(randomForest)
+    trainSet <- read.csv("C:/Dropbox/Private/R/PracticalMachineLearning/pml-training.csv", na.strings=c("NA",""))
+    testSet <- read.csv("C:/Dropbox/Private/R/PracticalMachineLearning/pml-testing.csv", na.strings=c("NA",""))
+    
+
+    cleanTrain <- trainSet[,colSums(is.na(trainSet)) == 0]
+    cleanTest <-testSet[,colSums(is.na(testSet)) == 0]
+```
+
+#   Training and Cross-Validation datasets
+Use 70% for train and 30% for test
+
+```{r}
+    trainIndex <- createDataPartition(y = cleanTrain$classe, p=0.7,list=FALSE)
+    trainSet <- cleanTrain[trainIndex,]
+    crossValidationSet <- cleanTrain[-trainIndex,]
+    # Removing columns with  time or names and new_window. Columns 1..6
+    removeIndex <- as.integer(c(1,2,3,4,5,6))
+    trainSet <- trainSet[,-removeIndex]
+    testSet <- cleanTest[,-removeIndex]
+```
+
+#   Training
+```{r}
+    mytrControl = trainControl(method = "cv", number = 4)
+    modelFit <- train(trainSet$classe ~., data = trainSet, method="rf", trControl = mytrControl)
+    modelFit
+    
+```
+
+#   Cross Validation
+```{r}
+    predicted <- predict(modelFit, crossValidationSet)
+    SampleError <- sum(predicted == crossValidationSet$classe)/nrow(crossValidationSet)
+```
+
+Out of sample error is `r SampleError`
+
+#   Testing on new data
+```{r}
+    answers <- predict(modelFit, testSet)
+    length(answers)
+    pml_write_files = function(answers){
+      n = length(answers)
+      for(i in 1:n){
+        filename = paste0("C:/Dropbox/Private/R/PracticalMachineLearning/problem_id_",i,".txt")
+        write.table(answers[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+      }
+    }
+```
+
+```{r}
+    pml_write_files(answers)
+```
+
